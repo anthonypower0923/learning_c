@@ -6,6 +6,14 @@
 
 char buffer[MAX_BUFFER_SIZE];
 
+typedef enum {
+    MENU_PRINT_ALL = 1,
+    MENU_CREATE_PERSON,
+    MENU_DELETE_PERSON,
+    MENU_DELETE_ALL,
+    MENU_EXIT
+} Menu_Command;
+
 void clearInputBuffer(void) {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
@@ -13,7 +21,7 @@ void clearInputBuffer(void) {
     }
 }
 
-int storePerson(Person *p,Person **arr){
+int storePerson(Person * const p,Person **arr){
     if(p == NULL){
         perror("Can't store person. Person is NULL.");
         return -1;
@@ -28,7 +36,7 @@ int storePerson(Person *p,Person **arr){
     return -1;
 }
 
-void printPersonByIndex(int index, Person **arr){
+void printPersonByIndex(int index, Person *const *arr){
     if(index < 0 || index >= PERSON_CAPACITY){
         printf("Invalid index \n");
         return;
@@ -47,7 +55,7 @@ bool deletePersonByIndex(int index, Person **arr){
     return true;
 }
 
-void printAllPeople(Person **arr){
+void printAllPeople(Person *const *arr){
     printf("--------- Printing all people ---------- \n");
     for(int i=0;i<PERSON_CAPACITY;i++){
         if(arr[i] != NULL){
@@ -70,7 +78,7 @@ void deleteAllPeople(Person **arr){
     return;
 }
 
-void inputName(char *buffer){
+void inputString(char *buffer){
     printf("Enter your name: \n");
     int index = 0;
     int c = getchar();
@@ -92,6 +100,14 @@ int inputID(){
     return id;
 }
 
+Menu_Command inputMenuCommand(){
+    int input;
+    printf("Enter your menu choice: \n");
+    scanf("%d", &input);
+    clearInputBuffer();
+    return (Menu_Command)input; //Casting int to menu command.
+}
+
 bool inputStatus(char *str) {
     int input;
     printf("Enter %s status (1 = true, 0 = false): ", str);
@@ -101,8 +117,8 @@ bool inputStatus(char *str) {
 }
 
 void createPersonFromUser(Person **arr){
-    printf("Enter person details: \n");
-    inputName(buffer);
+    printf("------------- Enter person details -------------- \n");
+    inputString(buffer);
     char *name = buffer;
     int id = inputID();
     bool membership_status = inputStatus("Membership");
@@ -120,7 +136,7 @@ void deletePersonFromUser(Person **arr){
 
 int main(){
     Person **arr = calloc(PERSON_CAPACITY, sizeof(Person *));
-    int command;
+    Menu_Command command;
     while(1){
         printf("------- Menu ------- \n");
         printf("1: Print All \n");
@@ -129,22 +145,22 @@ int main(){
         printf("4: Delete All People \n");
         printf("5: Quit \n");
         printf("-------------------- \n");
-        printf("Enter your choice: \n");
-        command = inputID();
+        // printf("Enter your choice: \n");
+        command = inputMenuCommand();
         switch (command){
-            case 1:
+            case MENU_PRINT_ALL:
                 printAllPeople(arr);
                 break;
-            case 2:
+            case MENU_CREATE_PERSON:
                 createPersonFromUser(arr);
                 break;
-            case 3:
+            case MENU_DELETE_PERSON:
                 deletePersonFromUser(arr);
                 break;
-            case 4:
+            case MENU_DELETE_ALL:
                 deleteAllPeople(arr);
                 break;
-            case 5:
+            case MENU_EXIT:
                 printf("Quitting... \n");
                 deleteAllPeople(arr);
                 free(arr);
@@ -153,45 +169,5 @@ int main(){
                break;
         }
     }
-    // char *name = "Zoe";
-    // inputName(buffer);
-    // char *name = buffer;
-    // int id = inputID();
-    // bool membership_status = inputStatus("Membership");
-    // bool adult_status = inputStatus("Adult");
-    // Person *p1 = createPerson(id, membership_status, adult_status, name);
-    // inputName(buffer);
-    // name = buffer;
-    // Person *p2 = createPerson(6, true, true, name);
-    // inputName(buffer);
-    // name = buffer;
-    // Person *p3 = createPerson(8, false, false, name);
-    // Person *p2 = createPerson(5, true, false, "Bob");
-    // Person *p3 = createPerson(7, false, false, "Sally");
-    // // if(p == NULL){
-    // //     perror("Person is NULL");
-    // //     return 1;
-    // // }
-    // storePerson(p1, arr);
-    // storePerson(p2, arr);
-    // storePerson(p3, arr);
-    // // if(index != -1){
-    // //     printPersonByIndex(index,arr);
-    // // }
-    // // printPerson(p);
-    // // char *new_name = "John";
-    // // updateName(p,new_name);
-    // // updateStatus(p, true);
-    // printAllPeople(arr);
-    // // if(index != -1){
-    // //     bool deleted = deletePersonByIndex(index,arr);
-    // //     printf("Was person deleted: %d \n" , deleted);
-    // // }
-    // // deletePerson(p);
-    // deletePersonByIndex(1,arr);
-    // printAllPeople(arr);
-    // Person *p4 = createPerson(7, false, false, "Mike");
-    // storePerson(p4, arr);
-    // printAllPeople(arr);
     return 0;
 }
