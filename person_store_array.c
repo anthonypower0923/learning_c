@@ -1,19 +1,20 @@
-#include "person_store.h"
-#include "person.h"
+#include "person_store_internal.h"
 #include <stdlib.h>
 #define INITIAL_PERSON_CAPACITY 3
 
 typedef struct{
+    PersonStore base;
     Person **people;
     size_t capacity; // Number of slots
     size_t count; // Number of occupied slots
 } ArrayPersonStore;
 
+
 // method stubs
-ArrayPersonStore *arrayPersonStoreCreateArray(void);
+PersonStore *personStoreCreateArray(void);
 bool arrayPersonStoreInsertPerson(Person * const p,PersonStore *store);
 bool arrayPersonStoreDeletePerson(int id, PersonStore *store);
-Person *arrayPersonStoreFindPerson(int id, PersonStore *store);
+Person * arrayPersonStoreFindPerson(int id, PersonStore *store);
 void arrayPersonStorePrintAllPeople(PersonStore *store);
 void arrayPersonStoreDeleteAllPeople(PersonStore *store);
 void arrayPersonStoreDestroy(PersonStore *store);
@@ -22,7 +23,16 @@ void arrayPersonStoreDestroy(PersonStore *store);
 bool arrayPersonStoreIsFull(ArrayPersonStore *store);
 bool arrayPersonStoreGrow(ArrayPersonStore *store);
 
-ArrayPersonStore *arrayPersonStoreCreateArray(void){
+PersonStorageOps arrayOps = {
+    .insertPerson = arrayPersonStoreInsertPerson,
+    .deletePerson = arrayPersonStoreDeletePerson,
+    .findPerson = arrayPersonStoreFindPerson,
+    .printAllPeople = arrayPersonStorePrintAllPeople,
+    .deleteAllPeople = arrayPersonStoreDeleteAllPeople,
+    .destroy = arrayPersonStoreDestroy
+};
+
+PersonStore *personStoreCreateArray(void){
     ArrayPersonStore *store = malloc(sizeof(ArrayPersonStore));
     if(store == NULL){
         return NULL;
@@ -34,7 +44,8 @@ ArrayPersonStore *arrayPersonStoreCreateArray(void){
     }
     store->capacity = INITIAL_PERSON_CAPACITY;
     store->count = 0;
-    return store;
+    store->base.ops = &arrayOps;
+    return &store->base;
 }
 
 bool arrayPersonStoreIsFull(ArrayPersonStore *store){
@@ -58,4 +69,9 @@ bool arrayPersonStoreGrow(ArrayPersonStore *store){
     store->people = new_people;
     store->capacity = new_capacity;
     return true;
+}
+
+bool arrayPersonStoreInsertPerson(Person * const p,PersonStore *store){
+    // Cast genric person store to array person store
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
 }
