@@ -1,4 +1,5 @@
 #include "person.h"
+#include "person_store.h"
 #include <stdio.h>
 #define PERSON_CAPACITY 10
 #define MAX_BUFFER_SIZE 256
@@ -21,62 +22,62 @@ void clearInputBuffer(void) {
     }
 }
 
-int storePerson(Person * const p,Person **arr){
-    if(p == NULL){
-        perror("Can't store person. Person is NULL.");
-        return -1;
-    }
-    for(int i=0;i<PERSON_CAPACITY;i++){
-        if(arr[i] == NULL){
-            arr[i] = p;
-            return i;
-        }
-    }
-    perror("Couldn't store person");
-    return -1;
-}
+// int storePerson(Person * const p,Person **arr){
+//     if(p == NULL){
+//         perror("Can't store person. Person is NULL.");
+//         return -1;
+//     }
+//     for(int i=0;i<PERSON_CAPACITY;i++){
+//         if(arr[i] == NULL){
+//             arr[i] = p;
+//             return i;
+//         }
+//     }
+//     perror("Couldn't store person");
+//     return -1;
+// }
 
-void printPersonByIndex(int index, Person *const *arr){
-    if(index < 0 || index >= PERSON_CAPACITY){
-        printf("Invalid index \n");
-        return;
-    }
-    printPerson(arr[index]);
-    return;
-}
+// void printPersonByIndex(int index, Person *const *arr){
+//     if(index < 0 || index >= PERSON_CAPACITY){
+//         printf("Invalid index \n");
+//         return;
+//     }
+//     printPerson(arr[index]);
+//     return;
+// }
 
-bool deletePersonByIndex(int index, Person **arr){
-    if(index < 0 || index >= PERSON_CAPACITY){
-        printf("Invalid index. Can't delete. \n");
-        return false;
-    }
-    deletePerson(arr[index]);
-    arr[index] = NULL;
-    return true;
-}
+// bool deletePersonByIndex(int index, Person **arr){
+//     if(index < 0 || index >= PERSON_CAPACITY){
+//         printf("Invalid index. Can't delete. \n");
+//         return false;
+//     }
+//     deletePerson(arr[index]);
+//     arr[index] = NULL;
+//     return true;
+// }
 
-void printAllPeople(Person *const *arr){
-    printf("--------- Printing all people ---------- \n");
-    for(int i=0;i<PERSON_CAPACITY;i++){
-        if(arr[i] != NULL){
-            printf("Index: %d \n" , i);
-            printPerson(arr[i]);
-        }
-    }
-    return;
-}
+// void printAllPeople(Person *const *arr){
+//     printf("--------- Printing all people ---------- \n");
+//     for(int i=0;i<PERSON_CAPACITY;i++){
+//         if(arr[i] != NULL){
+//             printf("Index: %d \n" , i);
+//             printPerson(arr[i]);
+//         }
+//     }
+//     return;
+// }
 
-void deleteAllPeople(Person **arr){
-    printf("--------- Deleting all people ---------- \n");
-    for(int i=0;i<PERSON_CAPACITY;i++){
-        if(arr[i] != NULL){
-            // printf("Index: %d \n" , i);
-            deletePerson(arr[i]);
-            arr[i] = NULL;
-        }
-    }
-    return;
-}
+// void deleteAllPeople(Person **arr){
+//     printf("--------- Deleting all people ---------- \n");
+//     for(int i=0;i<PERSON_CAPACITY;i++){
+//         if(arr[i] != NULL){
+//             // printf("Index: %d \n" , i);
+//             deletePerson(arr[i]);
+//             arr[i] = NULL;
+//         }
+//     }
+//     return;
+// }
 
 void inputString(char *buffer){
     printf("Enter your name: \n");
@@ -94,7 +95,7 @@ void inputString(char *buffer){
 
 int inputID(){
     int id;
-    printf("Enter you id: \n");
+    printf("Enter your id: \n");
     scanf("%d", &id);
     clearInputBuffer();
     return id;
@@ -116,7 +117,7 @@ bool inputStatus(char *str) {
     return input != 0;
 }
 
-void createPersonFromUser(Person **arr){
+void createPersonFromUser(PersonStore *store){
     printf("------------- Enter person details -------------- \n");
     inputString(buffer);
     char *name = buffer;
@@ -124,18 +125,19 @@ void createPersonFromUser(Person **arr){
     bool membership_status = inputStatus("Membership");
     bool adult_status = inputStatus("Adult");
     Person *p1 = createPerson(id, membership_status, adult_status, name);
-    int index = storePerson(p1,arr);
-    printf("Stored person %s \n", (index == -1) ? "Unsuccessfully" : "Successfully");
+    bool res = personStoreInsertPerson(p1,store);
+    printf("Stored person %s \n", (res ) ? "Successfully" : "UnSuccessfully");
 }
 
-void deletePersonFromUser(Person **arr){
-    int index = inputID();
-    deletePersonByIndex(index, arr);
+void deletePersonFromUser(PersonStore *store){
+    int id = inputID();
+    personStoreDeletePerson(id, store);
     return;
 }
 
 int main(){
-    Person **arr = calloc(PERSON_CAPACITY, sizeof(Person *));
+    // Person **arr = calloc(PERSON_CAPACITY, sizeof(Person *));
+    PersonStore *store = personStoreCreateArray();
     Menu_Command command;
     while(1){
         printf("------- Menu ------- \n");
@@ -149,21 +151,21 @@ int main(){
         command = inputMenuCommand();
         switch (command){
             case MENU_PRINT_ALL:
-                printAllPeople(arr);
+                personStorePrintAllPeople(store);
                 break;
             case MENU_CREATE_PERSON:
-                createPersonFromUser(arr);
+                createPersonFromUser(store);
                 break;
             case MENU_DELETE_PERSON:
-                deletePersonFromUser(arr);
+                deletePersonFromUser(store);
                 break;
             case MENU_DELETE_ALL:
-                deleteAllPeople(arr);
+                personStoreDeleteAllPeople(store);
                 break;
             case MENU_EXIT:
                 printf("Quitting... \n");
-                deleteAllPeople(arr);
-                free(arr);
+                personStoreDestroy(store);
+                // free(store);
                 return 0;
             default:
                break;

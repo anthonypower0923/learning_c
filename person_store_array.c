@@ -1,5 +1,7 @@
+#include "person.h"
 #include "person_store_internal.h"
 #include <stdlib.h>
+#include <stdio.h>
 #define INITIAL_PERSON_CAPACITY 3
 
 typedef struct{
@@ -57,6 +59,10 @@ bool arrayPersonStoreIsFull(ArrayPersonStore *store){
 }
 
 bool arrayPersonStoreGrow(ArrayPersonStore *store){
+    if(store == NULL){
+        printf("Store is NULL. Can't grow. \n");
+        return false;
+    }
     size_t new_capacity = store->capacity * 2;
     Person **new_people = realloc(store->people,(new_capacity * sizeof(Person *)));
     if(new_people == NULL){
@@ -72,6 +78,107 @@ bool arrayPersonStoreGrow(ArrayPersonStore *store){
 }
 
 bool arrayPersonStoreInsertPerson(Person * const p,PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't insert.\n");
+        return false;
+    }
     // Cast genric person store to array person store
     ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+    // Check if we have space.
+    if(arrayPersonStoreIsFull(array_store)){
+        if(!(arrayPersonStoreGrow(array_store))){
+            printf("Couldn't resize.\n");
+            return false;
+        }
+    }
+    for(size_t i=0;i<array_store->capacity;i++){
+        if(array_store->people[i] == NULL){
+            array_store->people[i] = p;
+            array_store->count++;
+            return true;
+        }
+    }
+    return false;
+}
+
+void arrayPersonStorePrintAllPeople(PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't print.\n");
+        return;
+    }
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+
+    if(array_store->count == 0){
+        printf("Store is empty.\n");
+        return;
+    }
+
+    for(size_t i=0;i<array_store->capacity;i++){
+        if(array_store->people[i] != NULL){
+            printPerson(array_store->people[i]);
+        }
+    }
+    return;
+}
+
+bool arrayPersonStoreDeletePerson(int id, PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't print.\n");
+        return false;
+    }
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+
+    for(size_t i=0;i<array_store->capacity;i++){
+        if(array_store->people[i] != NULL && array_store->people[i]->id == id){
+            deletePerson(array_store->people[i]);
+            array_store->people[i] = NULL;
+            array_store->count--;
+            return true;
+        }
+    }
+    return false;
+}
+
+void arrayPersonStoreDeleteAllPeople(PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't delete all.\n");
+        return;
+    }
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+
+    for(size_t i=0;i<array_store->capacity;i++){
+        if(array_store->people[i] != NULL){
+            deletePerson(array_store->people[i]);
+            array_store->people[i] = NULL;
+        }
+    }
+    array_store->count = 0;
+    return;
+}
+
+Person * arrayPersonStoreFindPerson(int id, PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't find.\n");
+        return NULL;
+    }
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+
+    for(size_t i=0;i<array_store->capacity;i++){
+        if(array_store->people[i] != NULL && array_store->people[i]->id == id){
+            return array_store->people[i];
+        }
+    }
+    return NULL;
+}
+
+void arrayPersonStoreDestroy(PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't destroy.\n");
+        return;
+    }
+    arrayPersonStoreDeleteAllPeople(store);
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+    free(array_store->people);
+    free(array_store);
+    return;
 }
