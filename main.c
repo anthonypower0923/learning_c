@@ -147,6 +147,7 @@ Person *findPerson(PersonStore *store){
 int main(){
     // Person **arr = calloc(PERSON_CAPACITY, sizeof(Person *));
     PersonStore *store = personStoreCreateArray();
+    bool sorted = true;
     Menu_Command command;
 
     while(1){
@@ -162,18 +163,24 @@ int main(){
         command = inputMenuCommand();
         switch (command){
             case MENU_PRINT_ALL:
+                if (!sorted){
+                    personStoreBubbleSort(store);
+                }
                 personStorePrintAllPeople(store);
                 break;
             case MENU_CREATE_PERSON:
                 createPersonFromUser(store);
+                sorted = false;
                 break;
             case MENU_FIND_PERSON:
                 findPerson(store);
             case MENU_DELETE_PERSON:
                 deletePersonFromUser(store);
+                sorted = false;
                 break;
             case MENU_DELETE_ALL:
                 personStoreDeleteAllPeople(store);
+                sorted = true;
                 break;
             case MENU_EXIT:
                 printf("Quitting... \n");
