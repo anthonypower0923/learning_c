@@ -136,11 +136,12 @@ void deletePersonFromUser(PersonStore *store){
     return;
 }
 
-Person *findPerson(PersonStore *store){
+void findPerson(PersonStore *store){
     int id = inputID();
     personStoreBubbleSort(store);
     Person *p = personStoreFindPerson(id,store);
-    return p;
+    printPerson(p);
+    return;
 }
 
 
