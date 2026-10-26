@@ -21,3 +21,5 @@ void personStoreDeleteAllPeople(PersonStore *store);
 
 // Destroy person store. Free all people and free storage.
 void personStoreDestroy(PersonStore *store);
+
+void personStoreBubbleSort(PersonStore *store);

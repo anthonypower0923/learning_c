@@ -8,6 +8,7 @@ typedef struct PersonStorageOps{
     void (* printAllPeople)(PersonStore *store);
     void (* deleteAllPeople)(PersonStore *store);
     void (* destroy)(PersonStore *store);
+    void (* sortPeople)(PersonStore *store);
 } PersonStorageOps;
 
 // Internal definition of PersonStore

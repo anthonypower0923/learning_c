@@ -1,4 +1,5 @@
 #include "person.h"
+#include "person_store.h"
 #include "person_store_internal.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -20,6 +21,7 @@ Person * arrayPersonStoreFindPerson(int id, PersonStore *store);
 void arrayPersonStorePrintAllPeople(PersonStore *store);
 void arrayPersonStoreDeleteAllPeople(PersonStore *store);
 void arrayPersonStoreDestroy(PersonStore *store);
+void arrayPersonStoreBubbleSort(PersonStore *store);
 
 // internal method stubs
 bool arrayPersonStoreIsFull(ArrayPersonStore *store);
@@ -31,7 +33,8 @@ PersonStorageOps arrayOps = {
     .findPerson = arrayPersonStoreFindPerson,
     .printAllPeople = arrayPersonStorePrintAllPeople,
     .deleteAllPeople = arrayPersonStoreDeleteAllPeople,
-    .destroy = arrayPersonStoreDestroy
+    .destroy = arrayPersonStoreDestroy,
+    .sortPeople = arrayPersonStoreBubbleSort,
 };
 
 PersonStore *personStoreCreateArray(void){
@@ -158,16 +161,29 @@ void arrayPersonStoreDeleteAllPeople(PersonStore *store){
 
 Person * arrayPersonStoreFindPerson(int id, PersonStore *store){
     if(store == NULL){
-        printf("Input is NULL. Can't find.\n");
+        printf("Input is NULL. Can't destroy.\n");
         return NULL;
     }
     ArrayPersonStore *array_store = (ArrayPersonStore *)store;
-
-    for(size_t i=0;i<array_store->capacity;i++){
-        if(array_store->people[i] != NULL && array_store->people[i]->id == id){
-            return array_store->people[i];
+    int l = 0;
+    int r = array_store->count-1;
+    while(l <= r){
+        int mid = l + ((r - l) / 2);
+        // If mid is equal to id.
+        if(array_store->people[mid]->id == id){
+            printf("Found person \n");
+            return array_store->people[mid];
+        }
+        // If mid is greater than id.
+        else if(array_store->people[mid]->id > id){
+            r = mid - 1;
+        }
+        // If mid is less than id.
+        else {
+            l = mid + 1;
         }
     }
+    printf("Person not found\n");
     return NULL;
 }
 
@@ -180,5 +196,39 @@ void arrayPersonStoreDestroy(PersonStore *store){
     ArrayPersonStore *array_store = (ArrayPersonStore *)store;
     free(array_store->people);
     free(array_store);
+    return;
+}
+
+void arrayPersonStoreBubbleSort(PersonStore *store){
+    if(store == NULL){
+        printf("Input is NULL. Can't sort.\n");
+        return;
+    }
+    ArrayPersonStore *array_store = (ArrayPersonStore *)store;
+
+    if(array_store->count <= 1){
+        printf("Only one person. Already sorted");
+        return;
+    }
+
+    int len = array_store->count;
+    while(len > 1){
+        bool swapped = false;
+        for(int i = 0;i<len-1;i++){
+            int j = i + 1;
+            Person *temp1 = array_store->people[i];
+            Person *temp2 = array_store->people[j];
+            if(temp1->id > temp2->id){
+                array_store->people[i] = temp2;
+                array_store->people[i+1] = temp1;
+                swapped = true;
+            }
+        }
+        if (!swapped){
+            printf("Already sorted.\n");
+            return;
+        }
+        len--;
+    }
     return;
 }

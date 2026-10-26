@@ -10,6 +10,7 @@ char buffer[MAX_BUFFER_SIZE];
 typedef enum {
     MENU_PRINT_ALL = 1,
     MENU_CREATE_PERSON,
+    MENU_FIND_PERSON,
     MENU_DELETE_PERSON,
     MENU_DELETE_ALL,
     MENU_EXIT
@@ -135,17 +136,27 @@ void deletePersonFromUser(PersonStore *store){
     return;
 }
 
+Person *findPerson(PersonStore *store){
+    int id = inputID();
+    personStoreBubbleSort(store);
+    Person *p = personStoreFindPerson(id,store);
+    return p;
+}
+
+
 int main(){
     // Person **arr = calloc(PERSON_CAPACITY, sizeof(Person *));
     PersonStore *store = personStoreCreateArray();
     Menu_Command command;
+
     while(1){
         printf("------- Menu ------- \n");
         printf("1: Print All \n");
         printf("2: Create Person \n");
-        printf("3: Delete Person \n");
-        printf("4: Delete All People \n");
-        printf("5: Quit \n");
+        printf("3: Find Person \n");
+        printf("4: Delete Person \n");
+        printf("5: Delete All People \n");
+        printf("6: Quit \n");
         printf("-------------------- \n");
         // printf("Enter your choice: \n");
         command = inputMenuCommand();
@@ -156,6 +167,8 @@ int main(){
             case MENU_CREATE_PERSON:
                 createPersonFromUser(store);
                 break;
+            case MENU_FIND_PERSON:
+                findPerson(store);
             case MENU_DELETE_PERSON:
                 deletePersonFromUser(store);
                 break;
