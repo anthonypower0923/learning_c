@@ -26,6 +26,6 @@ void personStoreDestroy(PersonStore *store){
     return store->ops->destroy(store);
 }
 
-void personStoreBubbleSort(PersonStore *store){
-    return store->ops->sortPeople(store);
-}
+// void personStoreBubbleSort(PersonStore *store){
+//     return store->ops->sortPeople(store);
+// }

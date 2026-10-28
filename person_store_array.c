@@ -34,7 +34,7 @@ PersonStorageOps arrayOps = {
     .printAllPeople = arrayPersonStorePrintAllPeople,
     .deleteAllPeople = arrayPersonStoreDeleteAllPeople,
     .destroy = arrayPersonStoreDestroy,
-    .sortPeople = arrayPersonStoreBubbleSort,
+    // .sortPeople = arrayPersonStoreBubbleSort,
 };
 
 PersonStore *personStoreCreateArray(void){
