@@ -1,5 +1,6 @@
 #include "person.h"
 #include "person_store.h"
+#include "person_store_bst.h"
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -172,6 +173,14 @@ void findPerson(PersonStore *store) {
 }
 
 int main(void) {
+    BSTPersonStore *bst_store = personStoreCreateBST();
+    BSTPersonStoreInsertPerson(3,bst_store);
+    BSTPersonStoreInsertPerson(1,bst_store);
+    BSTPersonStoreInsertPerson(5,bst_store);
+    BSTPersonStorePrintAllPeople(bst_store);
+    BSTPersonStoreDeleteAllPeople(bst_store);
+    free(bst_store);
+    return 0;
     PersonStore *store = personStoreCreateHashtable();
 
     if (store == NULL) {
