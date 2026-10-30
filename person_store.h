@@ -8,6 +8,8 @@ typedef struct PersonStore PersonStore;
 PersonStore *personStoreCreateArray(void);
 
 PersonStore *personStoreCreateHashtable(void);
+
+PersonStore *personStoreCreateBST(void);
 //
 // Common operations
 // - Insert person method
