@@ -173,14 +173,189 @@ void findPerson(PersonStore *store) {
 }
 
 int main(void) {
+
+
+
+    printf("\n========== BST TESTING ==========\n");
+
+    // 1. CREATE BST
+    printf("\n--- CREATE BST ---\n");
+
     BSTPersonStore *bst_store = personStoreCreateBST();
-    BSTPersonStoreInsertPerson(3,bst_store);
-    BSTPersonStoreInsertPerson(1,bst_store);
-    BSTPersonStoreInsertPerson(5,bst_store);
+
+    if(bst_store == NULL){
+        printf("Failed to create BST.\n");
+        return EXIT_FAILURE;
+    }
+
+    printf("BST successfully created.\n");
+
+    // 2. INSERT PEOPLE
+    printf("\n--- INSERT PEOPLE ---\n");
+
+    int values[] = {50, 30, 70, 20, 40, 60, 80, 35, 45, 65};
+
+    int size = sizeof(values) / sizeof(values[0]);
+
+    for(int i = 0; i < size; i++){
+        printf("Insert %d: %s\n",
+            values[i],
+            BSTPersonStoreInsertPerson(values[i], bst_store)
+                ? "SUCCESS" : "FAILED"
+        );
+    }
+
+    // Test duplicate insertion
+    printf("\n--- DUPLICATE INSERTION ---\n");
+
+    printf("Insert 50 again: %s\n",
+        BSTPersonStoreInsertPerson(50, bst_store)
+            ? "SUCCESS" : "REJECTED"
+    );
+
+    // 3. PRINT ALL PEOPLE
+    printf("\n--- PRINT ALL PEOPLE ---\n");
+
     BSTPersonStorePrintAllPeople(bst_store);
+
+    // 4. FIND PEOPLE
+    printf("\n--- FIND PEOPLE ---\n");
+
+    int search_values[] = {50, 20, 65, 100};
+    int search_size = sizeof(search_values) / sizeof(search_values[0]);
+
+    for(int i = 0; i < search_size; i++){
+
+        BSTNode *found = BSTPersonStoreFindPerson(
+            search_values[i], bst_store
+        );
+
+        printf("Find %d: %s\n",
+            search_values[i],
+            found != NULL ? "FOUND" : "NOT FOUND"
+        );
+    }
+
+    // 5. DELETE LEAF NODE
+    printf("\n--- DELETE LEAF NODE ---\n");
+
+    printf("Delete 20: %s\n",
+        BSTPersonStoreDeletePerson(20, bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 6. DELETE NODE WITH ONE CHILD
+    printf("\n--- DELETE NODE WITH ONE CHILD ---\n");
+
+    BSTPersonStoreDeletePerson(35, bst_store);
+
+    printf("Delete 40: %s\n",
+        BSTPersonStoreDeletePerson(40, bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 7. DELETE NODE WITH TWO CHILDREN
+    printf("\n--- DELETE NODE WITH TWO CHILDREN ---\n");
+
+    printf("Delete 70: %s\n",
+        BSTPersonStoreDeletePerson(70, bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 8. DELETE ROOT NODE
+    printf("\n--- DELETE ROOT NODE ---\n");
+
+    printf("Delete 50: %s\n",
+        BSTPersonStoreDeletePerson(50, bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 9. DELETE NONEXISTENT NODE
+    printf("\n--- DELETE NONEXISTENT NODE ---\n");
+
+    printf("Delete 999: %s\n",
+        BSTPersonStoreDeletePerson(999, bst_store)
+            ? "SUCCESS" : "CORRECTLY REJECTED"
+    );
+
+    // 10. FIND DELETED NODE
+    printf("\n--- FIND DELETED NODE ---\n");
+
+    printf("Find 50: %s\n",
+        BSTPersonStoreFindPerson(50, bst_store) != NULL
+            ? "FOUND" : "CORRECTLY NOT FOUND"
+    );
+
+    // 11. DELETE ALL PEOPLE
+    printf("\n--- DELETE ALL PEOPLE ---\n");
+
+    printf("Delete all: %s\n",
+        BSTPersonStoreDeleteAllPeople(bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 12. INSERT AFTER DELETE ALL
+    printf("\n--- INSERT AFTER CLEARING ---\n");
+
+    printf("Insert 100: %s\n",
+        BSTPersonStoreInsertPerson(100, bst_store)
+            ? "SUCCESS" : "FAILED"
+    );
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 13. TEST MAXIMUM CAPACITY
+    printf("\n--- TEST MAXIMUM CAPACITY ---\n");
+
     BSTPersonStoreDeleteAllPeople(bst_store);
-    free(bst_store);
-    return 0;
+
+    bool all_inserted = true;
+
+    for(int i = 1; i <= 15; i++){
+        if(!BSTPersonStoreInsertPerson(i, bst_store)){
+            all_inserted = false;
+            printf("Failed to insert %d.\n", i);
+        }
+    }
+
+    printf("Insert 15 nodes: %s\n",
+        all_inserted ? "SUCCESS" : "FAILED"
+    );
+
+    printf("Insert 16th node: %s\n",
+        BSTPersonStoreInsertPerson(16, bst_store)
+            ? "UNEXPECTED SUCCESS" : "CORRECTLY REJECTED"
+    );
+
+    // 14. DELETE ALL AGAIN
+    printf("\n--- DELETE ALL AGAIN ---\n");
+
+    BSTPersonStoreDeleteAllPeople(bst_store);
+
+    BSTPersonStorePrintAllPeople(bst_store);
+
+    // 15. DESTROY BST
+    printf("\n--- DESTROY BST ---\n");
+
+    BSTPersonStoreDestroy(bst_store);
+    bst_store = NULL;
+
+    printf("BST successfully destroyed.\n");
+
+    printf("\n========== TESTING COMPLETE ==========\n");
+
+    return EXIT_SUCCESS;
+
     PersonStore *store = personStoreCreateHashtable();
 
     if (store == NULL) {

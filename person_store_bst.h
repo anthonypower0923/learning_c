@@ -20,11 +20,10 @@ struct BSTPersonStore{
   int max_capacity;
 };
 
-bool insert(BSTNode **root,int val);
-void inOrderPrint(BSTNode *root);
-void freeBSTNodes(BSTNode *root);
-
 BSTPersonStore *personStoreCreateBST(void);
 bool BSTPersonStoreInsertPerson(int val,BSTPersonStore *store);
 void BSTPersonStorePrintAllPeople(BSTPersonStore *store);
 bool BSTPersonStoreDeleteAllPeople(BSTPersonStore *store);
+bool BSTPersonStoreDeletePerson(int val,BSTPersonStore *store);
+BSTNode * BSTPersonStoreFindPerson(int id, BSTPersonStore *store);
+void BSTPersonStoreDestroy(BSTPersonStore *store);

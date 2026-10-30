@@ -1,32 +1,27 @@
 #include "person.h"
+#include "person_store_bst.h"
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include "person_store_bst.h"
 #define MAX_CAPACITY 15
-
-typedef struct BSTNode BSTNode;
-typedef struct BSTPersonStore BSTPersonStore;
-
-struct BSTNode {
-    int value;
-    BSTNode *left;
-    BSTNode *right;
-};
-
-struct BSTPersonStore{
-  BSTNode *root;
-  int num_nodes;
-  int max_capacity;
-};
 
 bool insert(BSTNode **root,int val);
 void inOrderPrint(BSTNode *root);
 void freeBSTNodes(BSTNode *root);
+bool delete(BSTNode **root, int val);
+BSTNode *findMin(BSTNode *root);
+BSTNode *findBST(BSTNode *root, int val);
 
-BSTPersonStore *personStoreCreateBST(void);
-bool BSTPersonStoreInsertPerson(int val,BSTPersonStore *store);
-void BSTPersonStorePrintAllPeople(BSTPersonStore *store);
-bool BSTPersonStoreDeleteAllPeople(BSTPersonStore *store);
+BSTNode *findMin(BSTNode *root){
+    if(root == NULL){
+        return NULL;
+    }
+    while(root->left != NULL){
+        root = root->left;
+    }
+    return root;
+}
 
 void freeBSTNodes(BSTNode *root){
     if(root == NULL){
@@ -73,6 +68,54 @@ bool insert(BSTNode **root,int val){
     return false;
 }
 
+bool delete(BSTNode **root, int val){
+    if(*root == NULL){
+        return false;
+    }
+    if(val < (*root)->value){
+        return delete(&(*root)->left,val);
+    }
+    if (val > (*root)->value){
+        return delete(&(*root)->right,val);
+    }
+    // Found the node
+    BSTNode *temp = *root;
+    // 1: No children
+    if(temp->left == NULL && temp->right == NULL){
+        free(temp);
+        *root = NULL;
+        return true;
+    }
+    // 2: Only one child left/rght
+    if(temp->left == NULL){
+        *root = temp->right;
+        free(temp);
+        return true;
+    }
+    if(temp->right == NULL){
+        *root = temp->left;
+        free(temp);
+        return true;
+    }
+    // 3: Both children
+    BSTNode *succesor = findMin(temp->right);
+    temp->value = succesor->value;
+    return delete(&temp->right, succesor->value);
+}
+
+BSTNode *findBST(BSTNode *root, int val){
+    if(root == NULL){
+        return NULL;
+    }
+    if(val == root->value){
+        return root;
+    }
+    if(val < root->value){
+        return findBST(root->left,val);
+    }
+    return findBST(root->right,val);
+}
+
 BSTPersonStore *personStoreCreateBST(void){
     BSTPersonStore *store = malloc(sizeof(*store));
     if(store == NULL){
@@ -109,4 +152,24 @@ bool BSTPersonStoreDeleteAllPeople(BSTPersonStore *store){
     store->root = NULL;
     store->num_nodes = 0;
     return true;
+}
+
+bool BSTPersonStoreDeletePerson(int val,BSTPersonStore *store){
+    bool return_value = delete(&store->root,val);
+    store->num_nodes -= (return_value) ? 1 : 0;
+    return return_value;
+}
+
+BSTNode * BSTPersonStoreFindPerson(int id, BSTPersonStore *store){
+    BSTNode *n = findBST(store->root,id);
+    return n;
+}
+
+void BSTPersonStoreDestroy(BSTPersonStore *store){
+    if(store == NULL){
+        return;
+    }
+    BSTPersonStoreDeleteAllPeople(store);
+    free(store);
+    return;
 }
